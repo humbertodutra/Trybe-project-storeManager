@@ -1,6 +1,11 @@
 const express = require('express');
 
 const app = express();
+const router = require('./routers/index');
+
+app.use(express.json());
+app.use('/products', router.productsRouter);
+app.use('/sales', router.salesRouter);
 
 // não remova esse endpoint, é para o avaliador funcionar
 app.get('/', (_request, response) => {
