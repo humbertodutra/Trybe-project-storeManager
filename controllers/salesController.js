@@ -1,13 +1,18 @@
 const salesService = require('../services/salesService');
 
 const addSale = async (req, res) => {
-  const requisition = req.body;
-  const sale = await salesService.createProduct(requisition);
-  const type = Array.isArray(sale);
-  if (type) {
-    return res.status(sale[0].status).json(sale[0].message);
+  const arraySales = req.body;
+  const result = await salesService.createProduct(arraySales);
+  const typeResult = Array.isArray(result);
+  if (typeResult) {
+    result.find((element) => {
+      if (element.message) {
+        return res.status(element.status).json(element.message);
+      } return null;
+    });
+  } else {
+    res.status(201).json(result);
   }
-  return res.status(201).json(sale);
 };
 
 module.exports = {

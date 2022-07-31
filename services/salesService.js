@@ -1,43 +1,50 @@
 const salesModel = require('../models/salesModel');
 const productService = require('./productService');
 
-const verifingQuantity = (a) => {
-  if (a.quantity < 0 || a.quantity === 0) {
+const getValidateById = async (e) => {
+  if (!e.productId) return { status: 400, message: { message: '"productId" is required' } };
+  const checkingDb = await productService.getById(e.productId);
+  if (checkingDb === null) {
     return {
-      status: 422,
-      message: {
-        message: '"quantity" must be greater than or equal to 1',
-      },
+      status: 404, message: { message: 'Product not found' },
+    }; 
+  }
+};
+
+const getValidateByQuantity = async (e) => {
+  if (e.quantity < 0 || e.quantity === 0) {
+    return {
+      status: 422, message: { message: '"quantity" must be greater than or equal to 1' },
     };
   }
-  if (!a.quantity || a.quantity === '') {
- return {
-    status: 400, message: { message: '"quantity" is required"' },
-  }; 
-}
+  if (!e.quantity) {
+    return {
+      status: 400, message: { message: '"quantity" is required' },
+    };
+  }
 };
 
-const verifingProductId = async (a) => {
-  const verifingId = await productService.getById(a.productId);
-  if (!a.productId) return { status: 400, message: { message: '"productId" is required' } };
-  if (!verifingId) return { status: 404, message: { message: 'Product not found' } };
-};
-
-const productVerify = async (array) => Promise.all(array.map(async (a) => {
-  const byQuantity = await verifingQuantity(a);
-  const byId = await verifingProductId(a);
-
-  if (byQuantity) return byQuantity;
-  if (byId) return byId;
+const verifyAddSales = async (array) => Promise.all(array.map(async (e) => {
+  const validateById = await getValidateById(e);
+  if (validateById) {
+    return validateById;
+  }
+  const validateByQuantity = await getValidateByQuantity(e);
+  if (validateByQuantity) {
+    return validateByQuantity;
+  } 
+  return e;
 }));
-  
+ 
 const createProduct = async (array) => {
-  const verifyProduct = await productVerify(array);
-  const verified = await verifyProduct.filter((a) => a !== undefined);
-  if (verified.length >= 1) return verified;
-  const saleResult = await salesModel.createSale(array);
-  if (!saleResult) return null;
-  return (saleResult);
+  const verify = await verifyAddSales(array);
+  const logError = verify.filter((e) => (e.message));
+  if (logError.length > 0) {
+    return logError;
+  }
+  
+  const addProduct = salesModel.createSale(array);
+  return addProduct;
 };
 
 module.exports = {
