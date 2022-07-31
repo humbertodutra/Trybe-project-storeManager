@@ -18,6 +18,29 @@ const createSale = async (array) => {
   return result;
 };
 
+const getAllSales = async () => {
+  const newLocal = `SELECT * FROM StoreManager.sales_products 
+  INNER JOIN StoreManager.sales WHERE sales.id = sales_products.sale_id 
+  order by sales_products.sale_id ASC, sales_products.product_id ASC`;
+  const [row] = await connection.execute(
+    newLocal,
+  );
+  
+  return row;
+};
+
+const getSalesById = async (id) => { 
+  const newLocal = `SELECT * FROM StoreManager.sales_products 
+    INNER JOIN StoreManager.sales 
+    ON sales.id = sales_products.sale_id
+    where id = ?
+    order by sales_products.sale_id ASC, sales_products.product_id ASC`;
+  const [row] = await connection.execute(newLocal, [id]);
+  return row;
+};
+
 module.exports = {
   createSale,
+  getAllSales,
+  getSalesById,
 };

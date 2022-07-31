@@ -47,6 +47,38 @@ const createProduct = async (array) => {
   return addProduct;
 };
 
+const getAllSales = async () => {
+  const result = await salesModel.getAllSales();
+  const formatResult = result.map((a) => {
+    const { sale_id: saleId, product_id: productId, quantity, date } = a;
+    const obj = {
+      saleId,
+      date,
+      productId,
+      quantity,
+    };
+    return obj;
+  });
+  return formatResult;
+};
+
+const getSalesById = async (id) => {
+  const result = await salesModel.getSalesById(id);
+  if (result.length === 0) return [];
+  const format = result.map((a) => {
+    const { product_id: productId, quantity, date } = a;
+    const obj = {
+      productId,
+      quantity,
+      date,
+    };
+    return obj;
+  });
+  return format;
+};
+
 module.exports = {
   createProduct,
+  getAllSales,
+  getSalesById,
 };

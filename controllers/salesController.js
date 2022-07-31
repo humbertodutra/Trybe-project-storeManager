@@ -15,11 +15,20 @@ const addSale = async (req, res) => {
   }
 };
 
-module.exports = {
-  addSale,
+const getAllSales = async (req, res) => {
+  const result = await salesService.getAllSales();
+  if (!result) return res.stauts(404).json({ message: 'sales Not Found' });
+  return res.status(200).json(result);
 };
 
-// não é possivel realizar operaçoes em um venda sem o campo quantity
-// não é possivel realizar operaçoes com quatity menor o igual a 0
-// não é possivel realizar operaçoes com productId vazio
-// não é possivel realizar operaçoes com productId inexistente no banco de dados
+const getSalesById = async (req, res) => {
+    const { id } = req.params;
+    const result = await salesService.getSalesById(id);
+    if (result.length === 0) return res.status(404).json({ message: 'Sale not found' });
+    return res.status(200).json(result);
+};
+module.exports = {
+  addSale,
+  getAllSales,
+  getSalesById,
+};
