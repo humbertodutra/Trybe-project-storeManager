@@ -77,8 +77,30 @@ const getSalesById = async (id) => {
   return format;
 };
 
+const deleteSale = async (id) => {
+  const checkSaleId = await getSalesById(id);
+  if (!checkSaleId) return null;
+  const result = await salesModel.deleteSale(id);
+  return result;
+};
+
+const byId = async (id) => {
+  const checkId = await salesModel.getBy(id);
+  if (!checkId) return null;
+  return checkId;
+};
+
+const deleteSaleTwo = async (id) => {
+  const checkId = await byId(id);
+  if (!checkId) return null;
+  const deleteSaleDb = await salesModel.deleteSale(id);
+  return deleteSaleDb;
+};
+
 module.exports = {
   createProduct,
   getAllSales,
   getSalesById,
+  deleteSale,
+  deleteSaleTwo,
 };

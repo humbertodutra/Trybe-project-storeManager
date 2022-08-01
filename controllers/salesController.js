@@ -27,8 +27,22 @@ const getSalesById = async (req, res) => {
     if (result.length === 0) return res.status(404).json({ message: 'Sale not found' });
     return res.status(200).json(result);
 };
+
+const deleteSale = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteFromDb = await salesService.deleteSaleTwo(id);
+    if (!deleteFromDb) {
+      return res.status(404).json({ message: 'Sale not found' });
+    }
+    return res.status(204).send('ok');
+  } catch (error) {
+    return res.status(500).json({ message: 'error ao realizar a sua consulta' });
+  }
+};
 module.exports = {
   addSale,
   getAllSales,
   getSalesById,
+  deleteSale,
 };
