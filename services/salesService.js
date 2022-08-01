@@ -97,10 +97,40 @@ const deleteSaleTwo = async (id) => {
   return deleteSaleDb;
 };
 
+const updateSalesAssist = async (array) => Promise.all(array.map(async (a) => {
+  const validateById = await getValidateById(a);
+  if (validateById) {
+    return validateById;
+  }
+  const validateByQuantity = await getValidateByQuantity(a);
+  if (validateByQuantity) {
+    return validateByQuantity;
+  }
+  return a;
+}));
+
+const updateSale = async (id, array) => {
+  const verify = await updateSalesAssist(array);
+  const logError = verify.filter((e) => (e.message));
+  if (logError.length > 0) {
+    return logError;
+  }
+  const verifyid = await byId(id);
+  if (!verifyid) {
+    return [{
+      status: 404, message: { message: 'Sale not found' },
+    }]; 
+  }
+  
+  const updatingInDb = await salesModel.updateSale(id, array);
+  return updatingInDb;
+};
+
 module.exports = {
   createProduct,
   getAllSales,
   getSalesById,
   deleteSale,
   deleteSaleTwo,
+  updateSale,
 };

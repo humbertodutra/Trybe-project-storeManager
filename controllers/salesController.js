@@ -40,9 +40,24 @@ const deleteSale = async (req, res) => {
     return res.status(500).json({ message: 'error ao realizar a sua consulta' });
   }
 };
+
+const updateSale = async (req, res) => {
+    const arrayOfupdates = req.body;
+    const { id } = req.params;
+    const updatingInDb = await salesService.updateSale(id, arrayOfupdates);
+    const typeResult = Array.isArray(updatingInDb);
+    if (typeResult) {
+      updatingInDb.find((e) => {
+        if (e.message) {
+          return res.status(e.status).json(e.message);
+        } return null;
+      });
+} else return res.status(200).json(updatingInDb);
+};
 module.exports = {
   addSale,
   getAllSales,
   getSalesById,
   deleteSale,
+  updateSale,
 };
