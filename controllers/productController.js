@@ -51,8 +51,39 @@ const createProduct = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  try {
+    if (!name) { return res.status(400).json({ message: '"name" is required' }); }
+    if (name.length < 5) {
+      return res.status(422).json({ message: '"name" length must be at least 5 characters long' });
+    }
+    const result = await productService.updateProduct(id, name);
+    if (result === null) { return res.status(404).json({ message: 'Product not found' }); }
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ message: 'error ao realizar a sua consulta' });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleteFromDb = await productService.deleteProduct(id);
+      if (!deleteFromDb) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+      return res.status(204).send('ok');  
+    } catch (error) {
+      return res.status(500).json({ message: 'error ao realizar a sua consulta' });
+    }
+};
+
 module.exports = {
     getAll,
     getById,
     createProduct,
+    updateProduct,
+    deleteProduct,
 };
